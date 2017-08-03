@@ -34,7 +34,7 @@ namespace Weather;
  */
 class Helper
 {
-    use Communicator, Formatter;
+    use Communicator, Formatter, Storage;
 
     /**
      * Application API Key from your OpenWeatherMap account.
@@ -59,30 +59,39 @@ class Helper
     private $returnFormat = 'json';
 
     /**
+     * Array of locations to check at specified intervals.
+     *
+     * @var array
+     */
+    private $locationData = array();
+
+    /**
      * Public constructor method.  Must pass the OWM API Key
      * as the first parameter.
      *
      * @param string $api_key  Your OWM API Key
      * @param string $format   The preferred data return format for your app.
      */
-    public function construct($api_key = null, $format = 'json')
+    public function __construct($api_key = null, $format = '')
     {
         if (empty($api_key)) {
             raiseMissingAPIKeyException();
         }
 
+        date_default_timezone_set('UTC');
+
         $this->apiKey = trim(strtolower($api_key));
 
         switch ($format) {
             case 'xml':
-                $this->format = 'xml';
+                $this->returnFormat = 'xml';
                 break;
             case 'csv':
-                $this->format = 'csv';
+                $this->returnFormat = 'csv';
                 break;
             case 'json':
             default:
-                $this->format = 'json';
+                $this->returnFormat = 'json';
         }
     }
 
@@ -99,7 +108,31 @@ class Helper
             throw new \Exception('Missing or invalid zip code parameter.');            
         }
 
-        return $this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us&APPID=' . $this->apiURI), $this->returnFormat);
+        $weatherData = $this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us&APPID=' . $this->apiKey), $this->returnFormat);
+
+        $this->storeWeatherData($weatherData, $zip_code);
+
+        return $weatherData;
+    }
+
+    public function forecastByReg()
+    {
+        $regData_raw = file_get_contents('location_data.txt');
+        $regData_arr = explode(',', $regData_raw);
+
+        foreach ($regData_arr as $key => $val) {
+            $temp_loc = explode('|', $val);
+
+            if (file_exists($temp_loc[0] . '_weather_data.txt')) {
+                $temp_data     = file_get_contents($temp_loc[0] . '_weather_data.txt');
+                $temp_data_arr = explode('|', $temp_data);
+
+                if ((time() - intval($temp_data_arr[1])) > intval($temp_loc[1])) {
+                    $this->forcastByZip($temp_loc[0]);
+                    sleep(1);
+                }
+            }
+        }
     }
 
     /**
@@ -110,5 +143,23 @@ class Helper
     private function raiseMissingAPIKeyException()
     {
         throw new \Exception("Missing or invalid OpenWeatherMap API key parameter.  Cannot continue.");
+    }
+
+    public function registerLocations($zip_codes)
+    {
+        //file_put_contents('location_data.txt', $zip_codes, LOCK_EX);
+        $this->storeData($zip_codes, 'locations');
+    }
+
+    public function retrieveLocations()
+    {
+        //return file_get_contents('location_data.txt');
+        return $this->getData('locations');
+    }
+
+    public function storeWeatherData($weather, $location)
+    {
+        //file_put_contents($location . '_weather_data.txt', $weather . '|' . time(), LOCK_EX);
+        $this->storeData($weather . '|' . $location, 'weather')
     }
 }
