@@ -26,6 +26,7 @@
  ******************************************************************************/
  
 namespace Weather;
+
 /**
  * Generic communication proxy for various communication methods.
  *
