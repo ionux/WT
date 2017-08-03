@@ -34,7 +34,7 @@ namespace Weather;
  */
 class Helper
 {
-    use Communicator, Formatter, Storage;
+    use Communicator, Storage;
 
     /**
      * Application API Key from your OpenWeatherMap account.
@@ -63,7 +63,7 @@ class Helper
      *
      * @var array
      */
-    private $locationData = array();
+    //private $locationData = array();
 
     /**
      * Public constructor method.  Must pass the OWM API Key
@@ -96,7 +96,7 @@ class Helper
     }
 
     /**
-     * Helper function to retrieve weather data by zip code.
+     * Helper function to retrieve & store weather data by zip code.
      *
      * @param string $zip_code  The zip code you wish to look up.
      * @return string $weatherData  String containing weather information for the requested zip.
@@ -110,21 +110,29 @@ class Helper
 
         $weatherData = $this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us&APPID=' . $this->apiKey), $this->returnFormat);
 
-        $this->storeWeatherData($weatherData, $zip_code);
+        //$this->storeWeatherData($weatherData, $zip_code);
+        $this->storeData('weather', $weatherData . '|' . $zip_code);
 
         return $weatherData;
     }
 
+    private function formatData($data, $format)
+    {
+        return $data;
+    }
+
     public function forecastByReg()
     {
-        $regData_raw = file_get_contents('location_data.txt');
+        //$regData_raw = file_get_contents('location_data.txt');
+        $regData_raw = $this->getData('locations');
         $regData_arr = explode(',', $regData_raw);
 
         foreach ($regData_arr as $key => $val) {
             $temp_loc = explode('|', $val);
 
             if (file_exists($temp_loc[0] . '_weather_data.txt')) {
-                $temp_data     = file_get_contents($temp_loc[0] . '_weather_data.txt');
+                //$temp_data     = file_get_contents($temp_loc[0] . '_weather_data.txt');
+                $temp_data     = $this->getData('weather', $temp_loc[0]);
                 $temp_data_arr = explode('|', $temp_data);
 
                 if ((time() - intval($temp_data_arr[1])) > intval($temp_loc[1])) {
@@ -147,19 +155,19 @@ class Helper
 
     public function registerLocations($zip_codes)
     {
-        //file_put_contents('location_data.txt', $zip_codes, LOCK_EX);
-        $this->storeData($zip_codes, 'locations');
+        file_put_contents('location_data.txt', $zip_codes, LOCK_EX);
+        $this->storeData('locations', $zip_codes);
     }
 
     public function retrieveLocations()
     {
-        //return file_get_contents('location_data.txt');
+        return file_get_contents('location_data.txt');
         return $this->getData('locations');
     }
 
     public function storeWeatherData($weather, $location)
     {
-        //file_put_contents($location . '_weather_data.txt', $weather . '|' . time(), LOCK_EX);
-        $this->storeData($weather . '|' . $location, 'weather')
+        file_put_contents($location . '_weather_data.txt', $weather . '|' . time(), LOCK_EX);
+        $this->storeData('weather', $weather . '|' . $location);
     }
 }
