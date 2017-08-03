@@ -51,7 +51,7 @@ namespace Weather;
       * @param  $params string          The data itself.
       * @return         integer|string  Either the number of bytes written or error message.
       */
-     public function storeData($type, $params)
+     public function storeData($type, $params = '')
      {
          $filename = '';
 
