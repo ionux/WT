@@ -32,7 +32,7 @@ namespace Weather;
  *
  * @author Rich Morgan <rich@richmorgan.me>
  */
-class Helper
+class Weather
 {
     use Communicator, Storage;
 
@@ -42,7 +42,7 @@ class Helper
      * @var string
      */
     private $apiKey = '';
-    
+
     /**
      * Current OWM API Endpoint.
      * I.e. api.openweathermap.org/data/2.5/weather?zip={zip code},{country code} 
@@ -52,27 +52,12 @@ class Helper
     private $apiURI = 'http://api.openweathermap.org/data/2.5/weather';
 
     /**
-     * Format of returned data, i.e. xml, json, csv.
-     *
-     * @var string
-     */
-    private $returnFormat = 'json';
-
-    /**
-     * Array of locations to check at specified intervals.
-     *
-     * @var array
-     */
-    //private $locationData = array();
-
-    /**
      * Public constructor method.  Must pass the OWM API Key
      * as the first parameter.
      *
      * @param string $api_key  Your OWM API Key
-     * @param string $format   The preferred data return format for your app.
      */
-    public function __construct($api_key = null, $format = '')
+    public function __construct($api_key = null)
     {
         if (empty($api_key)) {
             raiseMissingAPIKeyException();
@@ -81,18 +66,6 @@ class Helper
         date_default_timezone_set('UTC');
 
         $this->apiKey = trim(strtolower($api_key));
-
-        switch ($format) {
-            case 'xml':
-                $this->returnFormat = 'xml';
-                break;
-            case 'csv':
-                $this->returnFormat = 'csv';
-                break;
-            case 'json':
-            default:
-                $this->returnFormat = 'json';
-        }
     }
 
     /**
@@ -108,9 +81,8 @@ class Helper
             throw new \Exception('Missing or invalid zip code parameter.');            
         }
 
-        $weatherData = $this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us&APPID=' . $this->apiKey), $this->returnFormat);
+        $weatherData = $this->getResource($this->apiURI, '?zip=' . $zip_code . ',us&APPID=' . $this->apiKey);
 
-        //$this->storeWeatherData($weatherData, $zip_code);
         $this->storeData('weather', $weatherData . '|' . $zip_code);
 
         return $weatherData;
@@ -123,7 +95,6 @@ class Helper
 
     public function forecastByReg()
     {
-        //$regData_raw = file_get_contents('location_data.txt');
         $regData_raw = $this->getData('locations');
         $regData_arr = explode(',', $regData_raw);
 
@@ -131,7 +102,6 @@ class Helper
             $temp_loc = explode('|', $val);
 
             if (file_exists($temp_loc[0] . '_weather_data.txt')) {
-                //$temp_data     = file_get_contents($temp_loc[0] . '_weather_data.txt');
                 $temp_data     = $this->getData('weather', $temp_loc[0]);
                 $temp_data_arr = explode('|', $temp_data);
 
@@ -155,19 +125,16 @@ class Helper
 
     public function registerLocations($zip_codes)
     {
-        file_put_contents('location_data.txt', $zip_codes, LOCK_EX);
         $this->storeData('locations', $zip_codes);
     }
 
     public function retrieveLocations()
     {
-        return file_get_contents('location_data.txt');
         return $this->getData('locations');
     }
 
     public function storeWeatherData($weather, $location)
     {
-        file_put_contents($location . '_weather_data.txt', $weather . '|' . time(), LOCK_EX);
         $this->storeData('weather', $weather . '|' . $location);
     }
 }
