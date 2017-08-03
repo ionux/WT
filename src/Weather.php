@@ -34,12 +34,14 @@ namespace Weather;
  */
 class Helper
 {
+    use Communicator, Formatter;
+
     /**
      * Application API Key from your OpenWeatherMap account.
      *
      * @var string
      */
-    private $apiKey = 'e3750bda3f6167c66122e58f2ebed337';
+    private $apiKey = '';
     
     /**
      * Current OWM API Endpoint.
@@ -97,5 +99,16 @@ class Helper
             throw new \Exception('Missing or invalid zip code parameter.');            
         }
 
-        
+        return this->formatData($this->getResource());
     }
+
+    /**
+     * Exception handler for constructor.
+     *
+     * @throws \Exception;
+     */
+    private function raiseMissingAPIKeyException()
+    {
+        throw new \Exception();
+    }
+}
