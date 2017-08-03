@@ -1,0 +1,42 @@
+{
+    "name": "ionux/Weather",
+    "description": "Weather is a php class to provide a convenient interface to the Open WeatherMap API.",
+    "keywords": ["weather","open","weathermap","api","convenience","class","helper","rain","storm","tornado","local","city","zip","code","region"],
+    "homepage": "https://github.com/ionux/Weather",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Rich Morgan",
+            "email": "rich@richmorgan.me",
+            "role": "Creator"
+        }
+    ],
+    "repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/ionux/Weather.git"
+		}
+	],
+    "support": {
+        "issues": "https://github.com/ionux/Weather/issues",
+        "email": "rich@richmorgan.me",
+        "source": "https://github.com/ionux/Weather"
+    },
+    "autoload": {
+        "psr-4": {
+            "Weather\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Weather\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.3"
+    }
+}
