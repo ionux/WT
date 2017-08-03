@@ -99,7 +99,7 @@ class Helper
             throw new \Exception('Missing or invalid zip code parameter.');            
         }
 
-        return this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us'));
+        return this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us'), $this->returnFormat);
     }
 
     /**
@@ -109,6 +109,6 @@ class Helper
      */
     private function raiseMissingAPIKeyException()
     {
-        throw new \Exception();
+        throw new \Exception("Missing or invalid OpenWeatherMap API key parameter.  Cannot continue.");
     }
 }
