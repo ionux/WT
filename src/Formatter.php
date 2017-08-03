@@ -40,7 +40,7 @@ trait Formatter
             throw new \Exception("No data passed to formatter.");
         }
 
-        switch strtolower(trim($format)) {
+        switch (strtolower(trim($format))) {
             case 'csv':
                 return $this->formatCSV($data);
             case 'json':
@@ -51,7 +51,7 @@ trait Formatter
 
     private function formatCSV($rawData)
     {
-        switch gettype($rawData) {
+        switch (gettype($rawData)) {
             case 'array':
                return implode(',', $rawData);
             case 'string':
