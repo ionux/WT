@@ -99,7 +99,7 @@ class Helper
             throw new \Exception('Missing or invalid zip code parameter.');            
         }
 
-        return this->formatData($this->getResource());
+        return this->formatData($this->getResource($this->apiURI, '?zip=' . $zip_code . ',us'));
     }
 
     /**
