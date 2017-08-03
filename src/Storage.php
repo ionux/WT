@@ -82,7 +82,7 @@ namespace Weather;
       * @param  $params string  Additional information to identify storage area.
       * @return         string  The data requested or an error message.
       */
-     public function getData($type, $params)
+     public function getData($type, $params = '')
      {
          $filename = '';
 
