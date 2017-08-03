@@ -28,11 +28,39 @@
 namespace Weather;
 
 /**
- * Generic formatter trait csv, json, xml.
+ * Generic formatter trait csv, json.  Future support for xml.
  *
  * @author Rich Morgan <rich@richmorgan.me>
  */
 trait Formatter
 {
+    public function formatData($data = '', $format = '')
+    {
+        if (empty($data)) {
+            throw new \Exception("No data passed to formatter.");
+        }
 
+        switch strtolower(trim($format)) {
+            case 'csv':
+                return $this->formatCSV($data);
+            case 'json':
+            default:
+                return $this->formatJSON($data);
+        }
+    }
+
+    private function formatCSV($rawData)
+    {
+        switch gettype($rawData) {
+            case 'array':
+               return implode(',', $rawData);
+            case 'string':
+                if (($decoded = json_decode($rawData)) == null) {
+                    throw new \Exception("Cannot convert data to CSV format.");
+                }
+                return implode(',', $decoded);
+            default:
+                throw new \Exception("Cannot convert data to CSV format.");
+        }
+    }
 }
