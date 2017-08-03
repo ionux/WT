@@ -32,5 +32,71 @@ namespace Weather;
  */
  trait Storage
  {
- 
+     /**
+      * @var string
+      */
+     private $locationFile = 'location_data.txt';
+
+     /**
+      * @var string
+      */
+     private $weatherFile = '_weather_data.txt';
+
+     /**
+      * Persists data to file depending on data type.
+      *
+      * @param  $type   string          The type of data you want to persist.
+      * @param  $params string          The data itself.
+      * @return         integer|string  Either the number of bytes written or error message.
+      */
+     public function storeData($type, $params)
+     {
+         $filename = '';
+
+         switch (strtolower(trim($type))) {
+             case 'locations':
+                 $filename = $this->$locationFile;
+                 break;
+             case 'weather':
+                 $temp_params = explode('|', $params);
+                 if (count($temp_params) > 1) {
+                     $filename = $temp_params[1] . $this->weatherFile;
+                     $params   = $temp_params[0] . '|' . time();
+                 }
+                 return;
+             default:
+                 // Empty
+         }
+
+         return ($filename != '')
+             ? file_put_contents($filename, $params, LOCK_EX)
+             : 'Cannot write data to file. Missing or invalid file name.';
+     }
+
+     /**
+      * Retrieves data from storage depending on data type.
+      *
+      * @param  $type   string  The type of data you want to retrieve.
+      * @param  $params string  Additional information to identify storage area.
+      * @return         string  The data requested or an error message.
+      */
+     public function getData($type, $params)
+     {
+         $filename = '';
+
+         switch (strtolower(trim($type))) {
+             case 'locations':
+                 $filename = $this->locationFile;
+                 break;
+             case 'weather':
+                 $filename = $params . $this->weatherFile;
+                 break;
+             default:
+                 // Empty
+         }
+
+         return (file_exists($filename))
+             ? file_get_contents($filename)
+             : 'Error retrieving data for ' . $type;
+     }
  }
