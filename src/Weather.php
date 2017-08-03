@@ -73,7 +73,7 @@ class Helper
 
         $this->apiKey = trim(strtolower($api_key));
 
-        switch $format {
+        switch ($format) {
             case 'xml':
                 $this->format = 'xml';
                 break;
