@@ -65,7 +65,7 @@ namespace Weather;
                      $filename = $temp_params[1] . $this->weatherFile;
                      $params   = $temp_params[0] . '|' . time();
                  }
-                 return;
+                 break;
              default:
                  // Empty
          }
