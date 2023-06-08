@@ -3,7 +3,7 @@
  * This file is part of the Weather PHP project. You can always find the latest
  * version of this class and project at: https://github.com/ionux/Weather
  *
- * Copyright (c) 2017 Rich Morgan, rich@richmorgan.me
+ * Copyright (c) 2017-2023 Rich Morgan, rich@richmorgan.me
  *
  * The MIT License (MIT)
  *
